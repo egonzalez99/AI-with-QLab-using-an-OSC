@@ -1,41 +1,47 @@
-import pythonosc 
-from pythonosc import updClient, dispatcher, osc_server
+import threading
+from pythonosc import udp_client, dispatcher, osc_server
 
-#qlab ip address and ports num put here
+# QLab's IP address and ports
 qLab_ip = "127.0.0.1"
-sendPort = 53000
-receivePort = 53001
+send_port = 53000
+receive_port = 53001
 
-threshold = 0.5 #adjusted when needed 
+threshold = 0.5  # Adjust as needed
 
-sendClient = updClient.SimpleUDPClient(qLab_ip, sendPort)
-receiveDispotcher = dispatcher.Dispotcher()
+send_client = udp_client.SimpleUDPClient(qLab_ip, send_port)
+receive_dispatcher = dispatcher.Dispatcher()
 
-def aiModel(inputData):
-    #ai processing here
-    return 0
+# replace with AI model 
+def ai_model(input_data):
+    # AI processing goes here
+    return 0  #  placeholder
 
-def feedback(address, *args): # *args use to group multiple positional arguments
+# Calculate performance metric - update with  logic
+def calculate_performance(predicted, real):
+    return abs(predicted - real)
+
+# handle feedback from QLab
+def feedback_handler(address, *args):
     try:
-        #trying to extracted feedback info
-        feedbackData = args[0]
-        predictedOut = feedbackData["predicted output"]
-        realOutput = feedbackData["real output"]
-    
-        performance = calculatePerformance(predictedOut, realOutput)
-    
-        if threshold > performance:
-            print("the threshold is greater than performance")
+        # feedback data (assuming positional arguments)
+        predicted_output = args[0]  
+        real_output = args[1]  
+        
+        performance = calculate_performance(predicted_output, real_output)
+        
+        if performance < threshold:
+            print("Performance below threshold. Retraining may be required.")
+        else:
+            print("Performance meets the threshold.")
     
     except Exception as e:
-        print("There is a error: ", e)
-    
-receiveDispotcher.map("feddback: ", feedback)
+        print("Error processing feedback: ", e)
 
-server = osc_server.ThreadingOSCUDPServer((qLab_ip, receivePort), receiveDispotcher)
-serverThread = threading.Thread(target = server.serverInfo)
-serverThread.sort()
+receive_dispatcher.map("/feedback", feedback_handler)
 
-#input data here
-inputData = ""
-sendClient.send_message("/process_data", inputData)
+server = osc_server.ThreadingOSCUDPServer((qLab_ip, receive_port), receive_dispatcher)
+server_thread = threading.Thread(target=server.serve_forever)
+server_thread.start()
+
+input_data = 1.0 
+send_client.send_message("/process_data", input_data)

@@ -1,34 +1,41 @@
 import openai
-import osc
+import osc  # Adjust with the actual OSC library you are using (e.g., python-osc)
 
-#in the string put the openai key id
-openai.apiKey = "API KEY ID"
+openai.api_key = "API KEY"
 
-client = osc.client("127.0.0.1", 53000) #readjust IP address and port num in Qlab
+client = osc.Client("127.0.0.1", 53000)  # IP address and port for QLab
 
-#this will process and generate text for QLab
+# process and handle the generated text for QLab
 def holdTextGenerator(address, args):
-    textGenerator = args[0] #zero to avoid randomness in openai api 
+    textGenerator = args[0] 
     print("Here's your text message: ", textGenerator)
     
+    # Check for 'start cue' in the generated text
     if "start cue" in textGenerator:
-        handleCue = textGenerator.add{"starting cue"}[0].split()
-    
-def textGenerator(prompt):
-    response = openai.Completion.create (
-        engine = "gpt-3.5-turbo-instruct", #this has a pricing of InputL $1.50 / 1M tokens Output: $2.00 / 1M tokens. Cna be changed
-        prompt = prompt,
-        token = 1000,
-        count = 1,
-        stop = None,
-        temperature = 0, #zero to avoid randomness for 
+        handleCue = textGenerator.split()  
+        # Extract cue number and send the OSC command to QLab
+        if "cue" in handleCue:
+            cue_number = handleCue[handleCue.index("cue") + 1]
+            client.send_message(f"/cue/{cue_number}/start", [])
+
+# This function generates text using OpenAI and sends it via OSC
+def generate_text(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-003", 
+        prompt=prompt,
+        max_tokens=1000,  
+        n=1,
+        stop=None,
+        temperature=0.0  # Low temperature for less randomness
     )
-    textGenerator = response.choices[0].text
-    client.sendMessage("/text_generated", textGenerator)
+    
+    # Extract the generated text
+    generated_text = response.choices[0].text
+    # Send generated text as an OSC message
+    client.send_message("/text_generated", generated_text)
 
-# OSC handler
-client.addMessage("/generate_text", textGenerator)
-client.addMessage("/text_generated", holdTextGenerator)
+# OSC handlers for incoming messages
+client.add_msg_handler("/generate_text", generate_text)  # Trigger text generation
+client.add_msg_handler("/text_generated", holdTextGenerator)  # Handle generated text
 
-# Start OSC client
 client.serve_forever()
