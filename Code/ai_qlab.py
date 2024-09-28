@@ -26,7 +26,7 @@ def mediaplayer(file_path):
             print(f"Error playing audio: {e}")
     
     # show an image
-    elif file_path.endswith('.jpg') or file_path.endswith('.png') or file_path.endswith('.gif'):
+    elif file_path.endswith('.jpg') or file_path.endswith('.png') or file_path.endswith('.gif') or file_path.endswith('.jpeg'):
         
         try:
             img = Image.open(file_path)
