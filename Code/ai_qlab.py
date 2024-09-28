@@ -1,49 +1,68 @@
-from PIL import Image
 from playsound import playsound
 import cv2
+from PIL import Image
 
-#require pillow, pygame, and moviepy Libraries
-def mediaplayer(file_path) : 
+def mediaplayer(file_path):
+    # open these type of text files 
+    if file_path.endswith(".txt") or file_path.endswith(".pdf"):
+        
+        try:
+            with open(file_path, 'r') as f:
+                text_content = f.read()
+                print("Text content(s): ")
+                print(text_content)
+                
+        except Exception as e:
+            print(f"Error reading file: {e}")
     
-    
-    #this will open these type of text files and its content(s)
-    if filename.endswith (".txt") or filename.endswith(".pdf"):
-        with open(file_path, 'r') as f:
-            textContent = print(f.read())
-            print("Text content: ")
-            print(textContent)
+    # play an audio file
+    elif file_path.endswith('.mp3') or file_path.endswith('.wav'):
+        
+        try:
+            playsound(file_path)
+            print("Audio file(s) played. ")
             
-    #this will show an image
-    elif filename.endswith('.mp3') or filename.endswith('.wav'):
-      playsound(filename)
-      print("Audio file played.")
-      
-    elif filename.endswith('.jpg') or filename.endswith('.png') or filename.endswith('.gif'):
-        img = cv2.imread(filename)
-        cv2.imshow('Image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        print("Image is displayed.")
-    #this will show show a video playing. ret will verify if it reads. 
-    # cap to caputre video and frame to hold the frames    
-    elif filename.endswith('.mp4') or filename.endswith('.avi'):
-        cap = cv2.VideoCapture(filename)
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            cv2.imshow('Video', frame)
-            #quit the video with q key after 1 millisecond
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            cap.release()
+        except Exception as e:
+            print(f"Error playing audio: {e}")
+    
+    # show an image
+    elif file_path.endswith('.jpg') or file_path.endswith('.png') or file_path.endswith('.gif'):
+        
+        try:
+            img = Image.open(file_path)
+            img.show()
+            print("Image(s) displayed. ")
+            
+        except Exception as e:
+            print(f"Problem loading image: {e}")
+    
+    # this will play a video
+    elif file_path.endswith('.mp4') or file_path.endswith('.avi'):
+        try:
+            cap = cv2.VideoCapture(file_path)
+            while True:
+                ret, frame = cap.read()
+                
+                if not ret:
+                    break
+                
+                cv2.imshow('video', frame)
+                
+                # quit the video with 'q' key after 1 mills
+                if cv2.waitKey(1.5) & 0xFF == ord('q'):
+                    break
+                
+            cap.release()  
             cv2.destroyAllWindows()
             print("Video has played.")
+            
+        except Exception as e:
+            print(f"Problem playing video: {e}")
+            
     else:
-        print("This file type is not supported!")
+        print("This file format is not supported! Please try ampther.")
 
-#User inputs the filename
-filename = input("Please enter your filename: ")
+# inputs the file
+filename = input("Hello, please enter your filename: ")
 
-# Play the media file
 mediaplayer(filename)
