@@ -1,7 +1,18 @@
 from playsound import playsound
 import cv2
+import tkinter as tk
+from tkinter import filedialog
 from PIL import Image
 
+def load_media() :
+    file_path = filedialog.askopenfilename(title="Select a file")
+    
+    if not file_path :
+        return
+    
+    print(f"Here is your file: {file_path}.")
+    mediaplayer(file_path)
+    
 def mediaplayer(file_path):
     # open these type of text files 
     if file_path.endswith(".txt") or file_path.endswith(".pdf"):
@@ -62,7 +73,10 @@ def mediaplayer(file_path):
     else:
         print("This file format is not supported! Please try ampther.")
 
-# inputs the file
-filename = input("Hello, please enter your filename: ")
+root = tk.Tk()
+root.title("Drag and Drop Input Loader")
 
-mediaplayer(filename)
+load_button = tk.Button(root, text="Drag and Drop Media File", command=load_media)
+load_button.pack(pady=20)
+
+root.mainloop()
