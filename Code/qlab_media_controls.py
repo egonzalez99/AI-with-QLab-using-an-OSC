@@ -1,5 +1,5 @@
 import openai
-import osc  # Adjust with the actual OSC library you are using (e.g., python-osc)
+import osc  # replace with the actual OSC library (e.g., python-osc)
 
 openai.api_key = "API KEY"
 
