@@ -95,10 +95,63 @@ def mediaplayer(file_path):
     else:
         print("This file format is not supported! Please try ampther.")
 
+# This function generates text using OpenAI and sends it via OSC      
+def generate_text(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-003", 
+        prompt=prompt,
+        max_tokens=1000,  
+        n=1,
+        stop=None,
+        temperature=0.0  # Low temperature for less randomness
+    )
+    
+    # Extract the generated text
+    generated_text = response.choices[0].text
+    # Send generated text as an OSC message
+    client.send_message("/text_generated", generated_text)
+    return generate_text
+
+# process and handle the generated text for QLab
+def getTextGenerator(address, args):
+    textGenerator = args[0] 
+    print("Here's your text message: ", textGenerator)
+    
+    # Check for 'start cue' in the generated text
+    if "start cue" in textGenerator:
+        handleCue = textGenerator.split()  
+        # Extract cue number and send the OSC command to QLab
+        if "cue" in handleCue:
+            cue_number = handleCue[handleCue.index("cue") + 1]
+            client.send_message(f"/cue/{cue_number}/start", [])
+            
+# handle feedback from QLab
+def feedback_handle(address, *args):
+    try:
+        # feedback data (assuming positional arguments)
+        predicted_output = args[0]  
+        real_output = args[1]  
+        
+        performance = args(predicted_output, real_output)
+        
+        if performance < threshold:
+            print("Performance below threshold. Retraining may be required.")
+        else:
+            print("Performance meets the threshold.")
+    
+    except Exception as e:
+        print("Error processing feedback: ", e)
+
+#osc server and dispatch handling info from inputs and output it
+dispatcher_handle = dispatcher.Dispatcher()
+dispatcher_handle = 
+dispatcher_handle = 
+
 root = tk.Tk()
 root.title("Drag and Drop Input Loader")
 
 load_button = tk.Button(root, text="Drag and Drop Media File", command=load_media)
 load_button.pack(pady=20)
+
 
 root.mainloop()

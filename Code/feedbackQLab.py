@@ -21,7 +21,7 @@ def calculate_performance(predicted, real):
     return abs(predicted - real)
 
 # handle feedback from QLab
-def feedback_handler(address, *args):
+def feedback_handle(address, *args):
     try:
         # feedback data (assuming positional arguments)
         predicted_output = args[0]  
@@ -37,7 +37,7 @@ def feedback_handler(address, *args):
     except Exception as e:
         print("Error processing feedback: ", e)
 
-receive_dispatcher.map("/feedback", feedback_handler)
+receive_dispatcher.map("/feedback", feedback_handle)
 
 server = osc_server.ThreadingOSCUDPServer((qLab_ip, receive_port), receive_dispatcher)
 server_thread = threading.Thread(target=server.serve_forever)

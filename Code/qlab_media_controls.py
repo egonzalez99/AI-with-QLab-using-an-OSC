@@ -6,7 +6,7 @@ openai.api_key = "API KEY"
 client = osc.Client("127.0.0.1", 53000)  # IP address and port for QLab
 
 # process and handle the generated text for QLab
-def holdTextGenerator(address, args):
+def getTextGenerator(address, args):
     textGenerator = args[0] 
     print("Here's your text message: ", textGenerator)
     
@@ -36,6 +36,6 @@ def generate_text(prompt):
 
 # OSC handlers for incoming messages
 client.add_msg_handler("/generate_text", generate_text)  # Trigger text generation
-client.add_msg_handler("/text_generated", holdTextGenerator)  # Handle generated text
+client.add_msg_handler("/text_generated", getTextGenerator)  # Handle generated text
 
 client.serve_forever()
