@@ -1,6 +1,7 @@
 #this is Combining all of the previous code pieces into one giant code program to use ai with qlab 
 import threading
 import openai
+import osc
 from playsound import playsound
 from pythonosc import udp_client, dispatcher, osc_server
 import cv2
