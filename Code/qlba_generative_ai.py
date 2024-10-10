@@ -28,7 +28,7 @@ def load_media() :
         return
     
     cue_number = 1 #default num
-    client.send_message(f"/cue number target:", media_path)
+    client.send_message(f"/cue/{cue_number}/fileTarget", media_path)
     print(f"you are loading media {media_path} into cue: {cue_number}")
     
     
@@ -110,7 +110,7 @@ def generate_text(prompt):
     generated_text = response.choices[0].text
     # Send generated text as an OSC message
     client.send_message("/text_generated", generated_text)
-    return generate_text
+    return generated_text
 
 # process and handle the generated text for QLab
 def getTextGenerator(address, args):
@@ -132,7 +132,7 @@ def feedback_handle(address, *args):
         predicted_output = args[0]  
         real_output = args[1]  
         
-        performance = args(predicted_output, real_output)
+        performance = abs(predicted_output - real_output)
         
         if performance < threshold:
             print("Performance below threshold. Retraining may be required.")
@@ -141,17 +141,31 @@ def feedback_handle(address, *args):
     
     except Exception as e:
         print("Error processing feedback: ", e)
+        
+def prompt_Text() :
+    prompt = "Enter the cue you want"
+    generated_text = generate_text(prompt)
+    getTextGenerator("text: ", [generated_text])
+    
 
-#osc server and dispatch handling info from inputs and output it
+#osc server and dispatch handling info from inputs and output it. handle different osc messages
 dispatcher_handle = dispatcher.Dispatcher()
-dispatcher_handle = 
-dispatcher_handle = 
+dispatcher_handle = dispatcher.map("/feedback ", feedback_handle)
+dispatcher_handle = dispatcher.map("/text_generated ", getTextGenerator)
+
+#server side
+server = osc_server.ThreadingOSCUDPServer((qLab_ip, receive_port), dispatcher_handle)
+server = threading.Thread(target = server.serve_forever)
+server.start()
 
 root = tk.Tk()
 root.title("Drag and Drop Input Loader")
+root.geometry("540x360")
 
 load_button = tk.Button(root, text="Drag and Drop Media File", command=load_media)
 load_button.pack(pady=20)
 
+prompt_button = tk.Button(root, text="Generative Ai Text Here", command=prompt_Text)
+prompt_button.pack(pady=15)
 
 root.mainloop()
