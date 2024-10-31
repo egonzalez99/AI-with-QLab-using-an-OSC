@@ -23,7 +23,6 @@ def mediaplayer(file_path):
                 print("Text content(s):")
                 print(text_content)
                 
-            feedback_option(file_path)
         except Exception as e:
             print(f"Error reading text file: {e}")
     
@@ -34,7 +33,6 @@ def mediaplayer(file_path):
                 print("PDF content(s):")
                 for page in pdf.pages:
                     print(page.extract_text())
-            feedback_option(file_path)   
         except Exception as e:
             print(f"Error for PDF file: {e}")
     
@@ -55,7 +53,6 @@ def mediaplayer(file_path):
             img = Image.open(file_path)
             img.show()
             print("Image(s) displayed. ")
-            feedback_option(file_path)
             
         except Exception as e:
             print(f"Problem loading image: {e}")
@@ -85,7 +82,6 @@ def mediaplayer(file_path):
             cap.release()  
             cv2.destroyAllWindows()
             print("Video has played.")
-            feedback_option(file_path)
             
         except Exception as e:
             print(f"Problem playing video: {e}")
@@ -93,28 +89,33 @@ def mediaplayer(file_path):
     else:
         print("This file format is not supported! Please try ampther.")
         
+    feedback_option(file_path)
+        
 def feedback_option(file_path):
-    feedback_screen = tk.Toplevel(file_path)
+    feedback_screen = tk.Toplevel()
     feedback_screen.title("Feedback Mechanism")
     
-    prompt = tk.Label(feedback_screen, text="Do you want to keep this? ")
-    prompt.pack()
+    prompt = tk.Label(feedback_screen, text=f"Do you want to keep this? {file_path}")
+    prompt.pack(padx= 5, pady= 5)
 
     def store_feedback(yes):
-        with open("Feedbakc.txt", "a") as f:
-            f.write(f"{file_path}: {'Yes' if yes else 'No'} \n")
+        try: 
+            with open("Feedback.txt", "a") as f:
+                f.write(f"{file_path}: {'Yes' if yes else 'No'} \n")
+        except Exception as e:
+            print(f"Error with feedback mechanic: {e}")
         feedback_screen.destroy()
         
-        yes_button = tk.Button(feedback_screen, text= "Yes", command=lambda: store_feedback(True))
-        yes_button.pack(side= tk.LEFT, padx= 1)
+    yes_button = tk.Button(feedback_screen, text= "Yes", command=lambda: store_feedback(True))
+    yes_button.pack(side= tk.LEFT, padx= 5, pady= 5)
         
-        no_button =tk.Button(feedback_screen, text= "No", command= lambda: store_feedback(False))
-        no_button.pack(side=tk.RIGHT, padx= 1)
+    no_button =tk.Button(feedback_screen, text= "No", command= lambda: store_feedback(False))
+    no_button.pack(side=tk.RIGHT, padx= 5, pady= 5)
         
 root = tk.Tk()
 root.title("Drag and Drop Input Loader")
 
 load_button = tk.Button(root, text="Drag and Drop Media File", command=load_media)
-load_button.pack(pady=20)
+load_button.pack(pady=50, padx= 50)
 
 root.mainloop()
