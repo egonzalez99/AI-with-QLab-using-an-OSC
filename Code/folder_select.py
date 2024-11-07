@@ -43,3 +43,4 @@ while True:
     
     except Exception as e:
         print(f" Error: Please enter a valid number from 1 to {len(image_files)}")
+
